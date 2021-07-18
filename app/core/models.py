@@ -5,43 +5,32 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 class UserManager(BaseUserManager):
     
     def create_user(self, email, password=None, **extra_fields):
-        """Create and saves user
-
-        Args:
-            email ([type]): [description]
-            password ([type], optional): [description]. Defaults to None.
-        """
+        """Creates and saves a new User"""
         if not email:
-            raise ValueError("Users must have email address")
+            raise ValueError('Users must have an email address')
         user = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
-        
+
         return user
-    
+        
     def create_superuser(self, email, password):
-        """Create and save a new superuser 
-        """
-        user = self.create_user(email,password)
+        """Creates and saves a new super user"""
+        user = self.create_user(email, password)
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
-        
+
         return user
     
-class User(AbstractBaseUser,PermissionsMixin):
-    """Custom user model that support email instead of user name
-
-    Args:
-        AbstractBaseUser ([type]): [description]
-        PermissionsMixin ([type]): [description]
-    """
-    email = models.EmailField(max_length=255,unique=True)
+class User(AbstractBaseUser, PermissionsMixin):
+    """Custom user model that supports using email instead of username"""
+    email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    
+
     objects = UserManager()
-    
+
     USERNAME_FIELD = 'email'
     
